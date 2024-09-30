@@ -212,10 +212,11 @@ class View:
         self.game_cards[index].image = photo
 
     def atualiza_uso_hadware(self, cpu: psutil, ram: psutil.virtual_memory, gpu: GPUtil.getGPUs):
-        # clock_min = frequencia_cpu.min  # Clock mínimo em MHz
-        # clock_max = frequencia_cpu.max  # Clock máximo em MHz
+        clock_min = cpu.cpu_freq().min 
+        clock_max = cpu.cpu_freq().max
+        self.lbl_uso_cpu.configure(text=f"CPU: {cpu.cpu_count(False)}/{cpu.cpu_count(True)}")
         self.uso_cpu.configure(text=f"{cpu.cpu_percent(interval=1)}%")
-        self.clock_cpu.configure(text=f"{cpu.cpu_freq().current}Mhz")
+        self.clock_cpu.configure(text=f"{clock_min}/{clock_max}Mhz")
         # if 'coretemp' in cpu.sensors_temperatures():
         #     self.temp_cpu.configure(text=f"{cpu.sensors_temperatures()['coretemp'][0].current} °C")
         # else:

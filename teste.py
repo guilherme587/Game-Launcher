@@ -1,34 +1,74 @@
-import psutil
-import pygetwindow as gw
+import cpuinfo
 
-def encontrar_jogo(nome_jogo):
-    for proc in psutil.process_iter(['pid', 'name']):
-        if nome_jogo.lower() in proc.info['name'].lower():
-            return proc
-    return None
+# Obtém informações do CPU
+info = cpuinfo.get_cpu_info()
 
-def obter_janela_jogo(nome_jogo):
-    janelas = gw.getWindowsWithTitle(nome_jogo)
-    if janelas:
-        return janelas[0]
-    return None
+# Exibe a frequência do clock
+# print(f"Frequência do Clock: {info}")
+print(f"CPU NOME: {info['brand_raw']}")
+print(f"CPU CLOCK ATUAL: {info['hz_actual']}")
 
-# Nome do processo do jogo (ajuste conforme necessário)
-nome_jogo = "KingdomTwoCrowns"
 
-# Encontrar o processo do jogo
-processo_jogo = encontrar_jogo(nome_jogo)
-if processo_jogo:
-    print(f"Processo do jogo encontrado: {processo_jogo.info['name']} (PID: {processo_jogo.info['pid']})")
+
+
+
+import clr  # Importa o módulo pythonnet
+clr.AddReference(r'./dll/OpenHardwareMonitor/OpenHardwareMonitorLib')  # Atualize o caminho para o local correto da DLL
+
+from OpenHardwareMonitor.Hardware import Computer
+
+# Inicializa o objeto Computer
+c = Computer()
+c.CPUEnabled = True  # Habilita a coleta de informações da CPU
+c.GPUEnabled = False  # Habilita a coleta de informações da GPU
+c.Open()  # Abre a conexão com o hardware
+
+# Loop para atualizar e exibir os dados dos sensores
+while True:
+    for hardware in c.Hardware:
+        hardware.Update()  # Atualiza os dados do hardware
+        for sensor in hardware.Sensors:
+            print(f"{sensor.Name} ({sensor.SensorType}): {sensor.Value}")
+    break
+
+
+
+
+
+
+
+
+# import psutil
+# import pygetwindow as gw
+
+# def encontrar_jogo(nome_jogo):
+#     for proc in psutil.process_iter(['pid', 'name']):
+#         if nome_jogo.lower() in proc.info['name'].lower():
+#             return proc
+#     return None
+
+# def obter_janela_jogo(nome_jogo):
+#     janelas = gw.getWindowsWithTitle(nome_jogo)
+#     if janelas:
+#         return janelas[0]
+#     return None
+
+# # Nome do processo do jogo (ajuste conforme necessário)
+# nome_jogo = "KingdomTwoCrowns"
+
+# # Encontrar o processo do jogo
+# processo_jogo = encontrar_jogo(nome_jogo)
+# if processo_jogo:
+#     print(f"Processo do jogo encontrado: {processo_jogo.info['name']} (PID: {processo_jogo.info['pid']})")
     
-    # Encontrar a janela do jogo
-    janela_jogo = obter_janela_jogo(nome_jogo)
-    if janela_jogo:
-        print(f"Janela do jogo encontrada: {janela_jogo.title}")
-    else:
-        print("Janela do jogo não encontrada.")
-else:
-    print("Processo do jogo não encontrado.")
+#     # Encontrar a janela do jogo
+#     janela_jogo = obter_janela_jogo(nome_jogo)
+#     if janela_jogo:
+#         print(f"Janela do jogo encontrada: {janela_jogo.title}")
+#     else:
+#         print("Janela do jogo não encontrada.")
+# else:
+#     print("Processo do jogo não encontrado.")
 
 
 
