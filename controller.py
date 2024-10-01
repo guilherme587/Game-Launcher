@@ -52,8 +52,9 @@ class Controller:
                     self.view.update_image_nao_encontrada(index)
 
     def atualiza_uso_hadware(self):
-        cpu, ram, gpu = self.model.uso_hadware_porcentagem()
-        self.view.atualiza_uso_hadware(cpu, ram, gpu)
+        cpu, ram, gpu, hardware = self.model.uso_hadware_porcentagem()
+        print(hardware)
+        self.view.atualiza_uso_hadware(cpu, ram, gpu, hardware)
 
         threading.Timer(0.45, self.atualiza_uso_hadware).start()
 

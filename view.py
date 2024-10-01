@@ -89,10 +89,10 @@ class View:
 
         self.frame_cpu_detalhes = ctk.CTkFrame(self.frame_cpu, corner_radius=20)
         self.frame_cpu_detalhes.pack(side="left", padx=paddingFrameDetalhes, pady=paddingFrameDetalhes, fill="both", expand=False)
-        self.temp_cpu = ctk.CTkLabel(self.frame_cpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO), image=View.criar_label_redonda(width=135, height=80, radius=12), text="0 °C")
-        self.temp_cpu.pack(padx=10, pady=10)
         self.clock_cpu = ctk.CTkLabel(self.frame_cpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO), image=View.criar_label_redonda(width=135, height=80, radius=12), text="0Ghz")
         self.clock_cpu.pack(padx=10, pady=10)
+        self.temp_cpu = ctk.CTkLabel(self.frame_cpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO), image=View.criar_label_redonda(width=135, height=80, radius=12), text="0 °C")
+        self.temp_cpu.pack(padx=10, pady=10)
 
 
 
@@ -123,10 +123,10 @@ class View:
 
         self.frame_gpu_detalhes = ctk.CTkFrame(self.frame_gpu, corner_radius=20)
         self.frame_gpu_detalhes.pack(side="left", padx=paddingFrameDetalhes, pady=paddingFrameDetalhes, fill="both", expand=False)
-        self.vram_usada = ctk.CTkLabel(self.frame_gpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO), image=View.criar_label_redonda(width=135, height=80, radius=12, color="red"), text="1227 MB")
-        self.vram_usada.grid(row=0, column=0, padx=10, pady=10)
-        self.vram_total = ctk.CTkLabel(self.frame_gpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO), image=View.criar_label_redonda(width=135, height=80, radius=12, color="red"), text="6128 MB")
-        self.vram_total.grid(row=0, column=1,padx=10, pady=10)
+        self.vram = ctk.CTkLabel(self.frame_gpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO/1.3), image=View.criar_label_redonda(width=135, height=80, radius=12, color="red"), text="1227 MB")
+        self.vram.grid(row=0, column=0, padx=10, pady=10)
+        self.vram_clock = ctk.CTkLabel(self.frame_gpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO), image=View.criar_label_redonda(width=135, height=80, radius=12, color="red"), text="6128 MB")
+        self.vram_clock.grid(row=0, column=1,padx=10, pady=10)
         self.temp_gpu = ctk.CTkLabel(self.frame_gpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO), image=View.criar_label_redonda(width=135, height=80, radius=12, color="red"), text="0 °C")
         self.temp_gpu.grid(row=1, column=0, padx=10, pady=10)
         self.clock_gpu = ctk.CTkLabel(self.frame_gpu_detalhes, font=("Arial", FONTE_PESO_PARAGRAFO), image=View.criar_label_redonda(width=135, height=80, radius=12, color="red"), text="0Mhz")
@@ -211,27 +211,22 @@ class View:
         self.game_cards[index].configure(image=photo)
         self.game_cards[index].image = photo
 
-    def atualiza_uso_hadware(self, cpu: psutil, ram: psutil.virtual_memory, gpu: GPUtil.getGPUs):
-        clock_min = cpu.cpu_freq().min 
-        clock_max = cpu.cpu_freq().max
-        self.lbl_uso_cpu.configure(text=f"CPU: {cpu.cpu_count(False)}/{cpu.cpu_count(True)}")
-        self.uso_cpu.configure(text=f"{cpu.cpu_percent(interval=1)}%")
-        self.clock_cpu.configure(text=f"{clock_min}/{clock_max}Mhz")
-        # if 'coretemp' in cpu.sensors_temperatures():
-        #     self.temp_cpu.configure(text=f"{cpu.sensors_temperatures()['coretemp'][0].current} °C")
-        # else:
-        #     self.temp_cpu.configure(text="Erro")
-
+    def atualiza_uso_hadware(self, cpu: psutil, ram: psutil.virtual_memory, gpu: GPUtil.getGPUs, hardware: tuple):
+        self.lbl_uso_cpu.configure(text=f"CPU: {hardware.cpu['name']}\n({cpu.cpu_count(False)}/{cpu.cpu_count(True)})")
+        self.uso_cpu.configure(text=f"{round(cpu.cpu_percent(interval=1)*10, 2)}%")
+        self.clock_cpu.configure(text=f"{round(hardware.cpu['clock'], 2)} Mhz")
+        self.temp_cpu.configure(text=f"{round(hardware.cpu['power'], 2)} W\n{round(hardware.cpu['temperature'], 2)} °C")
+        
         self.uso_ram.configure(text=f"{ram.percent}%")
-        self.ram_usada.configure(text=f"{round(ram.used / (1024 ** 3), 2)}GB")
-        self.ram_total.configure(text=f"{round(ram.total / (1024 ** 3), 2)}GB")
+        self.ram_usada.configure(text=f"{round(ram.used / (1024 ** 3), 2)} GB")
+        self.ram_total.configure(text=f"{round(ram.total / (1024 ** 3), 2)} GB")
 
         self.lbl_uso_gpu.configure(text=f"GPU: {gpu[-1].name} \n Driver: {gpu[-1].driver}")
         self.uso_gpu.configure(text=f"{round(gpu[-1].load * 100, 2)}%")
-        self.vram_usada.configure(text=f"{gpu[-1].memoryUsed}MB")
-        self.vram_total.configure(text=f"{gpu[-1].memoryTotal}MB")
-        self.temp_gpu.configure(text=f"{gpu[-1].temperature} °C")
-        # self.clock_gpu.configure(text=f"{gpu[-1].clock} Mhz")
+        self.vram.configure(text=f"({gpu[-1].memoryUsed}/{gpu[-1].memoryTotal})MB")
+        self.vram_clock.configure(text=f"{round(hardware.gpu['memory_clock'], 2)}")
+        self.temp_gpu.configure(text=f"{round(hardware.gpu['power'], 2)} W\n{gpu[-1].temperature} °C")
+        self.clock_gpu.configure(text=f"{round(hardware.gpu['clock'], 2)} Mhz")
 
 
     def mainloop(self):

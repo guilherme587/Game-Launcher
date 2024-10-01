@@ -1,17 +1,3 @@
-import cpuinfo
-
-# Obtém informações do CPU
-info = cpuinfo.get_cpu_info()
-
-# Exibe a frequência do clock
-# print(f"Frequência do Clock: {info}")
-print(f"CPU NOME: {info['brand_raw']}")
-print(f"CPU CLOCK ATUAL: {info['hz_actual']}")
-
-
-
-
-
 import clr  # Importa o módulo pythonnet
 clr.AddReference(r'./dll/OpenHardwareMonitor/OpenHardwareMonitorLib')  # Atualize o caminho para o local correto da DLL
 
@@ -20,16 +6,20 @@ from OpenHardwareMonitor.Hardware import Computer
 # Inicializa o objeto Computer
 c = Computer()
 c.CPUEnabled = True  # Habilita a coleta de informações da CPU
-c.GPUEnabled = False  # Habilita a coleta de informações da GPU
+c.GPUEnabled = True  # Habilita a coleta de informações da GPU
+
 c.Open()  # Abre a conexão com o hardware
 
 # Loop para atualizar e exibir os dados dos sensores
 while True:
     for hardware in c.Hardware:
         hardware.Update()  # Atualiza os dados do hardware
+        print(hardware.Name)
         for sensor in hardware.Sensors:
-            print(f"{sensor.Name} ({sensor.SensorType}): {sensor.Value}")
+            # print(sensor.Name)                         
+            print(f"Name: {sensor.Name} SensorType: ({sensor.SensorType}) Value: {round(sensor.Value, 2)}")
     break
+
 
 
 
