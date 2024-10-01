@@ -3,7 +3,7 @@ from tkinter import PhotoImage
 from controller import Controller
 
 if __name__ == "__main__":
-    API_KEY = "e5472db761a14f029c156877863019b9"
+    API_KEY = ""
     RESOLUCAO = "960x540"
     
     # app = Controller(API_KEY, RESOLUCAO)
